@@ -10,7 +10,7 @@ from telethon.errors import SessionPasswordNeededError
 from telethon import Button
 
 # ========== КОНФИГ ==========
-BOT_TOKEN = '8557841311:AAFaAMArKf4QYw-mMQFMG89aE8LZq3ff7yI'
+BOT_TOKEN = os.getenv('BOT_TOKEN')
 ADMIN_IDS = [7465903807, 6844924312, 2066633503]
 APP_ID = 2040
 APP_HASH = 'b18441a1ff607e10a989891a5462e627'
